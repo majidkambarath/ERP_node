@@ -1,8 +1,6 @@
 const express = require('express');
-
 const cors = require('cors');
 const compression = require('compression');
-
 const cookieParser = require('cookie-parser');
 
 const coreAuthRouter = require('./routes/coreRoutes/coreAuth');
@@ -15,13 +13,20 @@ const errorHandlers = require('./handlers/errorHandlers');
 const erpApiRouter = require('./routes/appRoutes/appApi');
 
 const fileUpload = require('express-fileupload');
+
 // create our Express app
 const app = express();
 
+// CORS configuration - allowing all origins
 app.use(
   cors({
-    origin: true,
+    origin: '*', // Allow all origins
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+    exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
+    preflightContinue: false,
+    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
   })
 );
 
@@ -35,7 +40,6 @@ app.use(compression());
 // app.use(fileUpload());
 
 // Here our API Routes
-
 app.use('/api', coreAuthRouter);
 app.use('/api', adminAuth.isValidAuthToken, coreApiRouter);
 app.use('/api', adminAuth.isValidAuthToken, erpApiRouter);
